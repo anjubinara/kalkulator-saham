@@ -5,7 +5,7 @@
     <style>
         body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
         h1 { color: #2c3e50; text-align: center; }
-        input, button { padding: 8px; margin: 5px 0; }
+        input, button { padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box; }
         button { background: #3498db; color: white; border: none; cursor: pointer; }
         button:hover { background: #2980b9; }
         .result { background: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 20px; }
@@ -51,11 +51,12 @@
     <script>
         let rekap = [];
         let dcaCount = 0;
+        let rataRataGlobal = 0;
 
         function hitung() {
             const hargaAwal = parseFloat(document.getElementById('hargaAwal').value);
             const lotAwal = parseInt(document.getElementById('lotAwal').value);
-            
+
             if (!hargaAwal || !lotAwal) {
                 alert("Isi harga dan lot awal dulu!");
                 return;
@@ -72,34 +73,36 @@
             let totalLot = lotAwal;
             let totalBiaya = biayaAwal;
 
-            // Proses DCA
             const dcaInputs = document.querySelectorAll('.dca-input');
             dcaInputs.forEach((input, index) => {
                 const hargaDCA = parseFloat(input.querySelector('.harga-dca').value);
                 const lotDCA = parseInt(input.querySelector('.lot-dca').value);
-                const biayaDCA = hargaDCA * lotDCA * 100;
-                rekap.push({
-                    tahap: `DCA ke-${index + 1}`,
-                    harga: hargaDCA,
-                    lot: lotDCA,
-                    biaya: biayaDCA
-                });
-                totalLot += lotDCA;
-                totalBiaya += biayaDCA;
+                if (hargaDCA && lotDCA) {
+                    const biayaDCA = hargaDCA * lotDCA * 100;
+                    rekap.push({
+                        tahap: `DCA ke-${index + 1}`,
+                        harga: hargaDCA,
+                        lot: lotDCA,
+                        biaya: biayaDCA
+                    });
+                    totalLot += lotDCA;
+                    totalBiaya += biayaDCA;
+                }
             });
 
-            const rataRata = totalBiaya / (totalLot * 100);
             const totalLembar = totalLot * 100;
+            const rataRata = totalBiaya / totalLembar;
+            rataRataGlobal = rataRata;
 
             // Update UI
             document.getElementById('dcaSection').style.display = 'block';
             document.getElementById('result').style.display = 'block';
             document.getElementById('totalLot').textContent = totalLot;
-            document.getElementById('totalLembar').textContent = totalLembar;
-            document.getElementById('totalBiaya').textContent = totalBiaya.toLocaleString();
+            document.getElementById('totalLembar').textContent = totalLembar.toLocaleString('id-ID');
+            document.getElementById('totalBiaya').textContent = totalBiaya.toLocaleString('id-ID');
             document.getElementById('rataRata').textContent = rataRata.toFixed(2);
 
-            // Update Rekap Table
+            // Rekap table
             const table = document.getElementById('rekapTable');
             table.innerHTML = `<tr><th>Tahap</th><th>Harga (Rp)</th><th>Lot</th><th>Total Biaya (Rp)</th></tr>`;
             rekap.forEach(item => {
@@ -107,15 +110,15 @@
                 row.insertCell(0).textContent = item.tahap;
                 row.insertCell(1).textContent = item.harga.toFixed(2);
                 row.insertCell(2).textContent = item.lot;
-                row.insertCell(3).textContent = item.biaya.toLocaleString();
+                row.insertCell(3).textContent = item.biaya.toLocaleString('id-ID');
             });
 
-            // Target Jual
+            // Target jual
             const persenList = [2, 5, 7, 10, 12, 15, 20];
             let targetHTML = "<ul>";
-            persenList.forEach(persen => {
-                const target = rataRata * (1 + persen / 100);
-                targetHTML += `<li><b>Cuan ${persen}%</b> → Harga jual: Rp${target.toFixed(2)}</li>`;
+            persenList.forEach(p => {
+                const target = rataRata * (1 + p / 100);
+                targetHTML += `<li><b>Cuan ${p}%</b> → Harga jual: Rp${target.toFixed(2)}</li>`;
             });
             targetHTML += "</ul>";
             document.getElementById('targetJual').innerHTML = targetHTML;
@@ -133,25 +136,25 @@
         }
 
         function simulasiJual() {
-    const hargaJual = parseFloat(document.getElementById('hargaJual').value);
-    const totalLembar = parseInt(document.getElementById('totalLembar').textContent);
-    const totalBiaya = parseFloat(document.getElementById('totalBiaya').textContent.replace(/,/g, ''));
+            const hargaJual = parseFloat(document.getElementById('hargaJual').value);
+            const totalLembar = parseInt(document.getElementById('totalLembar').textContent.replace(/[.,]/g, ''));
+            const totalBiaya = parseFloat(document.getElementById('totalBiaya').textContent.replace(/[.,]/g, ''));
 
-    if (!hargaJual) {
-        alert("Isi harga jual dulu!");
-        return;
-    }
+            if (!hargaJual || !totalLembar || !totalBiaya) {
+                alert("Pastikan semua data lengkap.");
+                return;
+            }
 
-    const totalPenjualan = hargaJual * totalLembar;
-    const rataRata = totalBiaya / totalLembar;
-    const selisih = totalPenjualan - totalBiaya;
-    const persen = ((hargaJual - rataRata) / rataRata) * 100;
-    const status = selisih > 0 ? "Untung" : selisih < 0 ? "Rugi" : "Impas";
+            const totalPenjualan = hargaJual * totalLembar;
+            const rataRata = rataRataGlobal;
+            const selisih = totalPenjualan - totalBiaya;
+            const persen = ((hargaJual - rataRata) / rataRata) * 100;
+            const status = selisih > 0 ? "Untung" : selisih < 0 ? "Rugi" : "Impas";
 
-    document.getElementById('simulasiResult').innerHTML = `
-        <p><b>${status}!</b> ${selisih > 0 ? 'Untung' : 'Rugi'} Rp${Math.abs(selisih).toLocaleString()} (${persen.toFixed(2)}%)</p>
-        <p>Total nilai penjualan: Rp${totalPenjualan.toLocaleString()}</p>
-    `;
+            document.getElementById('simulasiResult').innerHTML = `
+                <p><b>${status}!</b> ${selisih > 0 ? 'Untung' : 'Rugi'} Rp${Math.abs(selisih).toLocaleString('id-ID')} (${persen.toFixed(2)}%)</p>
+                <p>Total nilai penjualan: Rp${totalPenjualan.toLocaleString('id-ID')}</p>
+            `;
         }
     </script>
 </body>

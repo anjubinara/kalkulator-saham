@@ -12,6 +12,10 @@
             background-color: #f9fbfc;
             color: #2c3e50;
             text-align: center;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 60px; /* Space for footer */
+            box-sizing: border-box;
         }
         h1 {
             font-size: 1.8rem;
@@ -27,6 +31,7 @@
         }
         .menu {
             margin-top: 2rem;
+            margin-bottom: 3rem;
         }
         .menu button {
             display: block;
@@ -44,10 +49,32 @@
         .menu button:hover {
             background-color: #2980b9;
         }
+        footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px 0;
+            background-color: #f0f4f8;
+            color: #7f8c8d;
+            font-size: 0.8rem;
+            border-top: 1px solid #e0e6ed;
+        }
+        footer p {
+            margin: 5px 0;
+        }
+        .social-links {
+            margin-top: 8px;
+        }
+        .social-links a {
+            color: #3498db;
+            text-decoration: none;
+            margin: 0 5px;
+        }
     </style>
 </head>
 <body>
-    <h1>“Orang kaya bukanlah yang penghasilannya besar, melainkan yang pengeluarannya kecil.”</h1>
+    <h1>"Orang kaya bukanlah yang penghasilannya besar, melainkan yang pengeluarannya kecil."</h1>
     <p class="quote">– anjubinara</p>
     <p><strong>Semangat nabung dan invest-nya yaa!<br>🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥 </strong></p>
     <p>Berikut beberapa tools yang bisa kamu gunakan untuk bantu ngatur dan rencanakan keuanganmu:</p>
@@ -56,5 +83,14 @@
         <button onclick="location.href='dca.html'">📈 Kalkulator DCA Saham</button>
         <button onclick="location.href='dividen.html'">💰 Kalkulator Deviden Saham</button>
     </div>
+
+    <footer>
+        <p>© 2025 Kalkulator Investasi</p>
+        <p>Dibuat dengan ❤️ untuk para investor pemula</p>
+        <div class="social-links">
+            <a href="https://www.instagram.com/anjubinara?igsh=c2RvZ3psbXBnaHZh" target="_blank">Instagram</a>
+            <a href="mailto:anjubinara@gmail.com">Kontak</a>
+        </div>
+    </footer>
 </body>
 </html>

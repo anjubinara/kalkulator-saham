@@ -133,24 +133,25 @@
         }
 
         function simulasiJual() {
-            const hargaJual = parseFloat(document.getElementById('hargaJual').value);
-            const totalLembar = parseInt(document.getElementById('totalLembar').textContent);
-            const totalBiaya = parseFloat(document.getElementById('totalBiaya').textContent.replace(/,/g, ''));
+    const hargaJual = parseFloat(document.getElementById('hargaJual').value);
+    const totalLembar = parseInt(document.getElementById('totalLembar').textContent);
+    const totalBiaya = parseFloat(document.getElementById('totalBiaya').textContent.replace(/,/g, ''));
 
-            if (!hargaJual) {
-                alert("Isi harga jual dulu!");
-                return;
-            }
+    if (!hargaJual) {
+        alert("Isi harga jual dulu!");
+        return;
+    }
 
-            const totalPenjualan = hargaJual * totalLembar;
-            const selisih = totalPenjualan - totalBiaya;
-            const persen = (selisih / totalBiaya) * 100;
-            const status = selisih > 0 ? "Untung" : selisih < 0 ? "Rugi" : "Impas";
+    const totalPenjualan = hargaJual * totalLembar;
+    const rataRata = totalBiaya / totalLembar;
+    const selisih = totalPenjualan - totalBiaya;
+    const persen = ((hargaJual - rataRata) / rataRata) * 100;
+    const status = selisih > 0 ? "Untung" : selisih < 0 ? "Rugi" : "Impas";
 
-            document.getElementById('simulasiResult').innerHTML = `
-                <p><b>${status}!</b> ${selisih > 0 ? 'Untung' : 'Rugi'} Rp${Math.abs(selisih).toLocaleString()} (${persen.toFixed(2)}%)</p>
-                <p>Total nilai penjualan: Rp${totalPenjualan.toLocaleString()}</p>
-            `;
+    document.getElementById('simulasiResult').innerHTML = `
+        <p><b>${status}!</b> ${selisih > 0 ? 'Untung' : 'Rugi'} Rp${Math.abs(selisih).toLocaleString()} (${persen.toFixed(2)}%)</p>
+        <p>Total nilai penjualan: Rp${totalPenjualan.toLocaleString()}</p>
+    `;
         }
     </script>
 </body>

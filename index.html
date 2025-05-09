@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kalkulator Saham DCA</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        h1 { color: #2c3e50; text-align: center; }
+        input, button { padding: 8px; margin: 5px 0; }
+        button { background: #3498db; color: white; border: none; cursor: pointer; }
+        button:hover { background: #2980b9; }
+        .result { background: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    </style>
+</head>
+<body>
+    <h1>🤑 Kalkulator Saham DCA</h1>
+    <div id="app">
+        <h3>🔷 Pembelian Awal</h3>
+        <input type="number" id="hargaAwal" placeholder="Harga beli awal (Rp)" step="0.01">
+        <input type="number" id="lotAwal" placeholder="Jumlah lot awal">
+        <button onclick="hitung()">Hitung Rata-Rata</button>
+
+        <div id="dcaSection" style="display: none;">
+            <h3>🔷 Tambah DCA</h3>
+            <div id="dcaInputs"></div>
+            <button onclick="tambahDCA()">+ Tambah DCA</button>
+            <button onclick="hitung()">Update Hitung</button>
+        </div>
+
+        <div id="result" class="result" style="display: none;">
+            <h3>📊 Hasil Kalkulasi</h3>
+            <table id="rekapTable">
+                <tr><th>Tahap</th><th>Harga (Rp)</th><th>Lot</th><th>Total Biaya (Rp)</th></tr>
+            </table>
+            <p>Total Lot: <span id="totalLot">0</span></p>
+            <p>Total Saham (lembar): <span id="totalLembar">0</span></p>
+            <p>Total Biaya: Rp<span id="totalBiaya">0</span></p>
+            <p>Harga Rata-Rata: Rp<span id="rataRata">0</span></p>
+
+            <h4>🎯 Target Harga Jual</h4>
+            <div id="targetJual"></div>
+
+            <h4>💰 Simulasi Jual</h4>
+            <input type="number" id="hargaJual" placeholder="Masukkan harga jual (Rp)" step="0.01">
+            <button onclick="simulasiJual()">Hitung Keuntungan</button>
+            <div id="simulasiResult"></div>
+        </div>
+    </div>
+
+    <script>
+        let rekap = [];
+        let dcaCount = 0;
+
+        function hitung() {
+            const hargaAwal = parseFloat(document.getElementById('hargaAwal').value);
+            const lotAwal = parseInt(document.getElementById('lotAwal').value);
+            
+            if (!hargaAwal || !lotAwal) {
+                alert("Isi harga dan lot awal dulu!");
+                return;
+            }
+
+            const biayaAwal = hargaAwal * lotAwal * 100;
+            rekap = [{
+                tahap: "Pembelian Awal",
+                harga: hargaAwal,
+                lot: lotAwal,
+                biaya: biayaAwal
+            }];
+
+            let totalLot = lotAwal;
+            let totalBiaya = biayaAwal;
+
+            // Proses DCA
+            const dcaInputs = document.querySelectorAll('.dca-input');
+            dcaInputs.forEach((input, index) => {
+                const hargaDCA = parseFloat(input.querySelector('.harga-dca').value);
+                const lotDCA = parseInt(input.querySelector('.lot-dca').value);
+                const biayaDCA = hargaDCA * lotDCA * 100;
+                rekap.push({
+                    tahap: `DCA ke-${index + 1}`,
+                    harga: hargaDCA,
+                    lot: lotDCA,
+                    biaya: biayaDCA
+                });
+                totalLot += lotDCA;
+                totalBiaya += biayaDCA;
+            });
+
+            const rataRata = totalBiaya / (totalLot * 100);
+            const totalLembar = totalLot * 100;
+
+            // Update UI
+            document.getElementById('dcaSection').style.display = 'block';
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('totalLot').textContent = totalLot;
+            document.getElementById('totalLembar').textContent = totalLembar;
+            document.getElementById('totalBiaya').textContent = totalBiaya.toLocaleString();
+            document.getElementById('rataRata').textContent = rataRata.toFixed(2);
+
+            // Update Rekap Table
+            const table = document.getElementById('rekapTable');
+            table.innerHTML = `<tr><th>Tahap</th><th>Harga (Rp)</th><th>Lot</th><th>Total Biaya (Rp)</th></tr>`;
+            rekap.forEach(item => {
+                const row = table.insertRow();
+                row.insertCell(0).textContent = item.tahap;
+                row.insertCell(1).textContent = item.harga.toFixed(2);
+                row.insertCell(2).textContent = item.lot;
+                row.insertCell(3).textContent = item.biaya.toLocaleString();
+            });
+
+            // Target Jual
+            const persenList = [2, 5, 7, 10, 12, 15, 20];
+            let targetHTML = "<ul>";
+            persenList.forEach(persen => {
+                const target = rataRata * (1 + persen / 100);
+                targetHTML += `<li><b>Cuan ${persen}%</b> → Harga jual: Rp${target.toFixed(2)}</li>`;
+            });
+            targetHTML += "</ul>";
+            document.getElementById('targetJual').innerHTML = targetHTML;
+        }
+
+        function tambahDCA() {
+            dcaCount++;
+            const dcaDiv = document.createElement('div');
+            dcaDiv.className = 'dca-input';
+            dcaDiv.innerHTML = `
+                <input type="number" class="harga-dca" placeholder="Harga DCA ke-${dcaCount}" step="0.01">
+                <input type="number" class="lot-dca" placeholder="Lot DCA ke-${dcaCount}">
+            `;
+            document.getElementById('dcaInputs').appendChild(dcaDiv);
+        }
+
+        function simulasiJual() {
+            const hargaJual = parseFloat(document.getElementById('hargaJual').value);
+            const totalLembar = parseInt(document.getElementById('totalLembar').textContent);
+            const totalBiaya = parseFloat(document.getElementById('totalBiaya').textContent.replace(/,/g, ''));
+
+            if (!hargaJual) {
+                alert("Isi harga jual dulu!");
+                return;
+            }
+
+            const totalPenjualan = hargaJual * totalLembar;
+            const selisih = totalPenjualan - totalBiaya;
+            const persen = (selisih / totalBiaya) * 100;
+            const status = selisih > 0 ? "Untung" : selisih < 0 ? "Rugi" : "Impas";
+
+            document.getElementById('simulasiResult').innerHTML = `
+                <p><b>${status}!</b> ${selisih > 0 ? 'Untung' : 'Rugi'} Rp${Math.abs(selisih).toLocaleString()} (${persen.toFixed(2)}%)</p>
+                <p>Total nilai penjualan: Rp${totalPenjualan.toLocaleString()}</p>
+            `;
+        }
+    </script>
+</body>
+</html>

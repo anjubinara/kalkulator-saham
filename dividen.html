@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalkulator Dividen Saham</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f9ff;
+      margin: 0;
+      padding: 20px;
+      color: #2c3e50;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #2980b9;
+      font-size: 28px;
+    }
+    .container {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .input-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #34495e;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 16px;
+      box-sizing: border-box;
+      transition: border 0.3s;
+    }
+    input:focus {
+      border-color: #3498db;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    }
+    .info-text {
+      font-size: 14px;
+      color: #7f8c8d;
+      margin-top: 5px;
+    }
+    .result-box {
+      background-color: #ebf5fb;
+      padding: 15px;
+      border-radius: 6px;
+      margin-top: 20px;
+      display: none;
+    }
+    .result-title {
+      font-weight: 600;
+      color: #2980b9;
+      margin-bottom: 10px;
+    }
+    .highlight {
+      font-weight: bold;
+      color: #e74c3c;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 14px;
+      color: #95a5a6;
+    }
+    .tab {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ddd;
+    }
+    .tab button {
+      background: none;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #7f8c8d;
+      transition: all 0.3s;
+    }
+    .tab button.active {
+      color: #3498db;
+      border-bottom: 2px solid #2980b9;
+      border-top: 2px solid #2980b9;
+      border-left: 2px solid #2980b9;
+      border-right: 2px solid #2980b9;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1>💰 Kalkulator Dividen Saham</h1>
+  
+  <div class="tab">
+    <button class="tab-btn active" onclick="openTab('calculator')">Kalkulator</button>
+    <button class="tab-btn" onclick="openTab('about')">Tentang</button>
+  </div>
+  
+  <div id="calculator" class="tab-content active">
+    <div class="container">
+      <p>Isi dua dari tiga nilai di bawah ini untuk menghitung nilai yang ketiga:</p>
+      
+      <div class="input-group">
+        <label for="modal">Total Modal Investasi (Rp)</label>
+        <input type="number" id="modal" placeholder="Contoh: 10000000">
+      </div>
+      
+      <div class="input-group">
+        <label for="yield">Dividend Yield Tahunan (%)</label>
+        <input type="number" id="yield" placeholder="Contoh: 8">
+        <p class="info-text">Persentase keuntungan dividen per tahun</p>
+      </div>
+      
+      <div class="input-group">
+        <label for="cuan">Pendapatan Dividen Tahunan (Rp)</label>
+        <input type="number" id="cuan" placeholder="Contoh: 800000">
+      </div>
+      
+      <div class="result-box" id="resultBox">
+        <div class="result-title">Hasil Perhitungan:</div>
+        <div id="resultText"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="about" class="tab-content">
+    <div class="container">
+      <h2 style="margin-top: 0;">Tentang Kalkulator Dividen</h2>
+      <p>Kalkulator ini membantu Anda menghitung:</p>
+      <ul>
+        <li>Jumlah modal yang dibutuhkan untuk target dividen tertentu</li>
+        <li>Dividend Yield berdasarkan modal dan pendapatan dividen</li>
+        <li>Pendapatan dividen berdasarkan modal dan yield</li>
+      </ul>
+      <p><strong>Rumus yang saya gunakan:</strong></p>
+      <p>Dividen = Modal × (Yield / 100)</p>
+      <p>Modal = Dividen / (Yield / 100)</p>
+      <p>Yield = (Dividen / Modal) × 100</p>
+      <p class="info-text">Selamat menghayal, selama kuku-kuku negara belum menetapkan pajak untuk khayalan kita masih merdeka.</p>
+    </div>
+  </div>
+  
+  <div class="footer">
+    © 2023 Kalkulator Dividen Saham | @anjubinara
+  </div>
+
+  <script>
+    const modalInput = document.getElementById('modal');
+    const yieldInput = document.getElementById('yield');
+    const cuanInput = document.getElementById('cuan');
+    const resultBox = document.getElementById('resultBox');
+    const resultText = document.getElementById('resultText');
+
+    function updateFields() {
+      const m = parseFloat(modalInput.value);
+      const y = parseFloat(yieldInput.value);
+      const c = parseFloat(cuanInput.value);
+      
+      // Reset result box
+      resultBox.style.display = 'none';
+      
+      // Hitung berdasarkan input yang diisi
+      if (!isNaN(m) && !isNaN(y) && document.activeElement !== cuanInput) {
+        const dividen = m * (y / 100);
+        cuanInput.value = dividen.toFixed(0);
+        showResult(`Dengan modal <span class="highlight">Rp${m.toLocaleString('id-ID')}</span> dan yield <span class="highlight">${y}%</span>, dividen tahunan Anda <span class="highlight">Rp${dividen.toLocaleString('id-ID')}</span>`);
+      } 
+      else if (!isNaN(c) && !isNaN(y) && document.activeElement !== modalInput) {
+        const modal = c / (y / 100);
+        modalInput.value = modal.toFixed(0);
+        showResult(`Untuk mendapatkan dividen <span class="highlight">Rp${c.toLocaleString('id-ID')}</span> dengan yield <span class="highlight">${y}%</span>, Anda butuh modal <span class="highlight">Rp${modal.toLocaleString('id-ID')}</span>`);
+      } 
+      else if (!isNaN(c) && !isNaN(m) && document.activeElement !== yieldInput) {
+        const yieldValue = (c / m) * 100;
+        yieldInput.value = yieldValue.toFixed(2);
+        showResult(`Dengan modal <span class="highlight">Rp${m.toLocaleString('id-ID')}</span> dan dividen <span class="highlight">Rp${c.toLocaleString('id-ID')}</span>, yield Anda <span class="highlight">${yieldValue.toFixed(2)}%</span>`);
+      }
+    }
+
+    function showResult(text) {
+      resultText.innerHTML = text;
+      resultBox.style.display = 'block';
+    }
+
+    function openTab(tabName) {
+      const tabContents = document.getElementsByClassName('tab-content');
+      for (let i = 0; i < tabContents.length; i++) {
+        tabContents[i].classList.remove('active');
+      }
+      
+      const tabButtons = document.getElementsByClassName('tab-btn');
+      for (let i = 0; i < tabButtons.length; i++) {
+        tabButtons[i].classList.remove('active');
+      }
+      
+      document.getElementById(tabName).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    modalInput.addEventListener('input', updateFields);
+    yieldInput.addEventListener('input', updateFields);
+    cuanInput.addEventListener('input', updateFields);
+  </script>
+</body>
+</html>

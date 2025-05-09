@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator DCA Saham</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f9ff;
+            color: #2c3e50;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        h1, h3, h4 {
+            text-align: center;
+            color: #2980b9;
+        }
+
+        h1 {
+            margin-bottom: 25px;
+            font-size: 28px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            transition: border 0.3s;
+        }
+
+        input:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 5px 0;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .button-group button {
+            flex: 1;
+        }
+
+        .dca-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .dca-input-group input {
+            flex: 1;
+        }
+
+        .result-box {
+            background-color: #ebf5fb;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f7fa;
+        }
+
+        .target-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .target-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .simulation-result {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            background-color: #f8f9fa;
+        }
+
+        .positive {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .negative {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .neutral {
+            color: #7f8c8d;
+            font-weight: bold;
+        }
+
+        /* Tab Styles */
+        .tab {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab button {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #7f8c8d;
+            transition: all 0.3s;
+        }
+        
+        .tab button.active {
+            color: #3498db;
+            border-bottom: 2px solid #2980b9;
+            border-top: 2px solid #2980b9;
+            border-left: 2px solid #2980b9;
+            border-right: 2px solid #2980b9;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Footer Styles */
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #95a5a6;
+        }
+
+        .info-text {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 480px) {
+            .dca-input-group {
+                flex-direction: column;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+
+            .tab button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>📈 Kalkulator DCA Saham</h1>
+    
+    <div class="tab">
+        <button class="tab-btn active" onclick="openTab('calculator')">Kalkulator</button>
+        <button class="tab-btn" onclick="openTab('about')">Tentang</button>
+    </div>
+
+    <div id="calculator" class="tab-content active">
+        <div class="section">
+            <h3>🔷 Pembelian Awal</h3>
+            <input type="number" id="hargaAwal" placeholder="Harga beli awal (Rp)" step="0.01" min="0">
+            <input type="number" id="lotAwal" placeholder="Jumlah lot awal" min="0">
+            <button onclick="hitung()">Hitung Rata-Rata</button>
+        </div>
+
+        <div id="dcaSection" class="section" style="display: none;">
+            <h3>🔷 Tambah DCA</h3>
+            <div id="dcaInputs"></div>
+            <div class="button-group">
+                <button onclick="tambahDCA()">+ Tambah DCA</button>
+                <button onclick="hitung()">Update Hitung</button>
+            </div>
+        </div>
+
+        <div id="result" class="section" style="display: none;">
+            <h3>📊 Hasil Kalkulasi</h3>
+            <table id="rekapTable">
+                <thead>
+                    <tr><th>Tahap</th><th>Harga (Rp)</th><th>Lot</th><th>Total Biaya (Rp)</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            
+            <div class="result-box">
+                <p>Total Lot: <strong id="totalLot">0</strong></p>
+                <p>Total Saham (lembar): <strong id="totalLembar">0</strong></p>
+                <p>Total Biaya: <strong>Rp<span id="totalBiaya">0</span></strong></p>
+                <p>Harga Rata-Rata: <strong>Rp<span id="rataRata">0</span></strong></p>
+            </div>
+
+            <h4>🎯 Target Harga Jual</h4>
+            <ul class="target-list" id="targetJual"></ul>
+
+            <h4>💰 Simulasi Jual</h4>
+            <input type="number" id="hargaJual" placeholder="Masukkan harga jual (Rp)" step="0.01" min="0">
+            <button onclick="simulasiJual()">Hitung Keuntungan</button>
+            <div id="simulasiResult" class="simulation-result"></div>
+        </div>
+    </div>
+
+    <div id="about" class="tab-content">
+        <div class="section">
+            <h3>📌 Tentang DCA (Dollar Cost Averaging)</h3>
+            <p>Kalkulator ini membantu Anda menghitung:</p>
+            <ul>
+                <li>Harga rata-rata pembelian saham</li>
+                <li>Total biaya investasi dengan strategi DCA</li>
+                <li>Simulasi keuntungan berdasarkan harga jual</li>
+            </ul>
+            
+            <p><strong>Rumus yang digunakan:</strong></p>
+            <p>Harga Rata-Rata = Total Biaya / Total Lembar Saham</p>
+            <p>Total Lembar = Σ(Lot × 100)</p>
+            <p>Persentase Keuntungan = ((Harga Jual - Rata Rata)/Rata Rata) × 100%</p>
+            
+            <p class="info-text">Catatan: Perhitungan belum termasuk biaya transaksi dan pajak ya.</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2023 Kalkulator DCA Saham | @anjubinara
+    </div>
+
+    <script>
+        let rekap = [];
+        let dcaCount = 0;
+        let rataRataGlobal = 0;
+
+        function hitung() {
+            const hargaAwal = parseFloat(document.getElementById('hargaAwal').value);
+            const lotAwal = parseInt(document.getElementById('lotAwal').value);
+
+            if (!hargaAwal || !lotAwal) {
+                alert("Harap isi harga dan lot awal terlebih dahulu!");
+                return;
+            }
+
+            const biayaAwal = hargaAwal * lotAwal * 100;
+            rekap = [{
+                tahap: "Pembelian Awal",
+                harga: hargaAwal,
+                lot: lotAwal,
+                biaya: biayaAwal
+            }];
+
+            let totalLot = lotAwal;
+            let totalBiaya = biayaAwal;
+
+            const dcaInputs = document.querySelectorAll('.dca-input-group');
+            dcaInputs.forEach((input, index) => {
+                const hargaDCA = parseFloat(input.querySelector('.harga-dca').value);
+                const lotDCA = parseInt(input.querySelector('.lot-dca').value);
+                
+                if (hargaDCA && lotDCA) {
+                    const biayaDCA = hargaDCA * lotDCA * 100;
+                    rekap.push({
+                        tahap: `DCA ke-${index + 1}`,
+                        harga: hargaDCA,
+                        lot: lotDCA,
+                        biaya: biayaDCA
+                    });
+                    totalLot += lotDCA;
+                    totalBiaya += biayaDCA;
+                }
+            });
+
+            const totalLembar = totalLot * 100;
+            const rataRata = totalBiaya / totalLembar;
+            rataRataGlobal = rataRata;
+
+            // Update UI
+            document.getElementById('dcaSection').style.display = 'block';
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('totalLot').textContent = totalLot;
+            document.getElementById('totalLembar').textContent = totalLembar.toLocaleString('id-ID');
+            document.getElementById('totalBiaya').textContent = totalBiaya.toLocaleString('id-ID');
+            document.getElementById('rataRata').textContent = rataRata.toFixed(2);
+
+            // Update rekap table
+            const tableBody = document.querySelector('#rekapTable tbody');
+            tableBody.innerHTML = '';
+            rekap.forEach(item => {
+                const row = tableBody.insertRow();
+                row.insertCell(0).textContent = item.tahap;
+                row.insertCell(1).textContent = item.harga.toFixed(2);
+                row.insertCell(2).textContent = item.lot;
+                row.insertCell(3).textContent = item.biaya.toLocaleString('id-ID');
+            });
+
+            // Update target jual
+            const persenList = [2, 5, 7, 10, 12, 15, 20];
+            const targetJual = document.getElementById('targetJual');
+            targetJual.innerHTML = '';
+            
+            persenList.forEach(p => {
+                const target = rataRata * (1 + p / 100);
+                const li = document.createElement('li');
+                li.innerHTML = `<b>Cuan ${p}%</b> → Harga jual: <strong>Rp${target.toFixed(2)}</strong>`;
+                targetJual.appendChild(li);
+            });
+        }
+
+        function tambahDCA() {
+            dcaCount++;
+            const dcaDiv = document.createElement('div');
+            dcaDiv.className = 'dca-input-group';
+            dcaDiv.innerHTML = `
+                <input type="number" class="harga-dca" placeholder="Harga DCA ke-${dcaCount}" step="0.01" min="0">
+                <input type="number" class="lot-dca" placeholder="Lot DCA ke-${dcaCount}" min="0">
+            `;
+            document.getElementById('dcaInputs').appendChild(dcaDiv);
+        }
+
+        function simulasiJual() {
+            const hargaJual = parseFloat(document.getElementById('hargaJual').value);
+            const totalLembar = parseInt(document.getElementById('totalLembar').textContent.replace(/[.,]/g, ''));
+            const totalBiaya = parseFloat(document.getElementById('totalBiaya').textContent.replace(/[.,]/g, ''));
+
+            if (!hargaJual) {
+                alert("Harap masukkan harga jual terlebih dahulu!");
+                return;
+            }
+
+            const totalPenjualan = hargaJual * totalLembar;
+            const rataRata = rataRataGlobal;
+            const selisih = totalPenjualan - totalBiaya;
+            const persenKeuntungan = (selisih / totalBiaya) * 100;
+            const persenDariRata = ((hargaJual - rataRata) / rataRata) * 100;
+            
+            let statusClass = "neutral";
+            let statusText = "Impas";
+            
+            if (selisih > 0) {
+                statusClass = "positive";
+                statusText = "Untung";
+            } else if (selisih < 0) {
+                statusClass = "negative";
+                statusText = "Rugi";
+            }
+
+            const resultDiv = document.getElementById('simulasiResult');
+            resultDiv.innerHTML = `
+                <p><strong>${statusText}!</strong> 
+                <span class="${statusClass}">
+                    ${selisih > 0 ? 'Untung' : selisih < 0 ? 'Rugi' : 'Impas'} Rp${Math.abs(selisih).toLocaleString('id-ID')} (${persenKeuntungan.toFixed(2)}%)
+                </span></p>
+                <p>Harga jual ${persenDariRata >= 0 ? 'di atas' : 'di bawah'} rata-rata: <strong>${Math.abs(persenDariRata).toFixed(2)}%</strong></p>
+                <p>Total nilai penjualan: <strong>Rp${totalPenjualan.toLocaleString('id-ID')}</strong></p>
+            `;
+        }
+
+        function openTab(tabName) {
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            
+            const tabButtons = document.getElementsByClassName('tab-btn');
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove('active');
+            }
+            
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>

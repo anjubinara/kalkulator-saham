@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kalkulator Compounding Saham</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 15px;
+            background: #f5f9ff;
+            color: #2c3e50;
+            max-width: 100%;
+            margin: 0 auto;
+            line-height: 1.6;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        h1, h3, h4 {
+            text-align: center;
+            color: #2980b9;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            transition: border 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 5px 0;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .button-group button {
+            flex: 1;
+        }
+
+        .result-box {
+            background-color: #ebf5fb;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 14px;
+            overflow-x: auto;
+            display: block;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th {
+            background-color: #f2f7fa;
+        }
+
+        .simulation-result {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            background-color: #f8f9fa;
+        }
+
+        .positive {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .negative {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .neutral {
+            color: #7f8c8d;
+            font-weight: bold;
+        }
+
+        /* Tab Styles */
+        .tab {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab button {
+            background: none;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #7f8c8d;
+            transition: all 0.3s;
+            flex: 1;
+            text-align: center;
+        }
+        .tab button.active {
+              color: #3498db;
+              border-bottom: 2px solid #2980b9;
+              border-top: 2px solid #2980b9;
+              border-left: 2px solid #2980b9;
+              border-right: 2px solid #2980b9;
+    }
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Footer Styles */
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #95a5a6;
+        }
+
+        .info-text {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .scenario-container {
+            margin-top: 20px;
+        }
+
+        .scenario-tabs {
+            display: flex;
+            overflow-x: auto;
+            margin-bottom: 10px;
+            scrollbar-width: none;
+        }
+
+        .scenario-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scenario-tab {
+            padding: 8px 15px;
+            background: #eee;
+            border: none;
+            margin-right: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .scenario-tab.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .summary-text {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .scenario-input {
+            display: none;
+        }
+
+        .scenario-input.active {
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 22px;
+            }
+            
+            .section {
+                padding: 12px;
+            }
+            
+            input, select, button {
+                padding: 10px;
+                font-size: 15px;
+            }
+            
+            table {
+                font-size: 13px;
+            }
+            
+            .tab button {
+                padding: 8px 10px;
+                font-size: 14px;
+            }
+        }
+
+        /* Chart container responsive */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        
+        /* Scenario comparison table */
+        .comparison-table {
+            width: 100%;
+            margin: 15px 0;
+            border-collapse: collapse;
+        }
+        
+        .comparison-table th {
+            background-color: #f2f7fa;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .comparison-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: right;
+        }
+        
+        .comparison-table .scenario-header {
+            background-color: #3498db;
+            color: white;
+            text-align: center;
+        }
+        
+        .best-value {
+            background-color: #e8f8f5;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>📊 Kalkulator Compounding Interest</h1>
+    
+    <div class="tab">
+        <button class="tab-btn active" onclick="openTab('calculator')">Kalkulator</button>
+        <button class="tab-btn" onclick="openTab('about')">Tentang</button>
+    </div>
+
+    <div id="calculator" class="tab-content active">
+        <div class="section">
+            <h3>🔷 Multi Skenario</h3>
+            <div class="scenario-tabs" id="scenarioTabs">
+                <button class="scenario-tab active" onclick="switchScenario(1)">Skenario 1</button>
+                <button class="scenario-tab" onclick="switchScenario(2)">Skenario 2</button>
+                <button class="scenario-tab" onclick="switchScenario(3)">Skenario 3</button>
+                <button class="scenario-tab" onclick="addScenario()">+</button>
+            </div>
+            
+            <div id="scenarioInputs">
+                <div class="scenario-input active" data-scenario="1">
+                    <h4>Investasi Awal</h4>
+                    <input type="number" id="investasiAwal1" placeholder="Jumlah investasi awal (Rp)" min="0">
+                    
+                    <h4>Periode & Return</h4>
+                    <input type="number" id="periode1" placeholder="Periode investasi (tahun)" min="1">
+                    <input type="number" id="returnRate1" placeholder="Return tahunan (%)" step="0.1" min="0">
+                    
+                    <h4>Tambahan Investasi Berkala</h4>
+                    <input type="number" id="investasiBulanan1" placeholder="Investasi bulanan (Rp)" min="0">
+                    
+                    <h4>Dividen</h4>
+                    <input type="number" id="dividenYield1" placeholder="Dividen yield tahunan (%)" step="0.1" min="0">
+                    <select id="dividenReinvest1">
+                        <option value="true">Reinvest dividen</option>
+                        <option value="false">Tidak reinvest dividen</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="hitungCompounding()">Hitung Pertumbuhan</button>
+                <button onclick="resetForm()">Reset</button>
+            </div>
+        </div>
+
+        <div id="result" class="section" style="display: none;">
+            <h3>📈 Hasil Perhitungan - Skenario <span id="currentScenarioDisplay">1</span></h3>
+            
+            <div id="summaryText" class="summary-text"></div>
+            
+            <div class="result-box">
+                <p>Nilai Akhir Investasi: <strong>Rp<span id="nilaiAkhir">0</span></strong></p>
+                <p>Total Investasi: <strong>Rp<span id="totalInvestasi">0</span></strong></p>
+                <p>Keuntungan: <strong>Rp<span id="keuntungan">0</span></strong></p>
+                <p>Persentase Keuntungan: <strong><span id="persenKeuntungan">0</span>%</strong></p>
+            </div>
+
+            <h4>📅 Proyeksi Tahunan</h4>
+            <div style="overflow-x: auto;">
+                <table id="proyeksiTable">
+                    <thead>
+                        <tr><th>Tahun</th><th>Nilai Investasi</th><th>Total Investasi</th><th>Keuntungan</th><th>ROI</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            
+            <h4>📊 Perbandingan Skenario</h4>
+            <div id="scenarioComparison"></div>
+            
+            <h4>📈 Grafik Gabungan Pertumbuhan</h4>
+            <div class="chart-container">
+                <canvas id="growthChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div id="about" class="tab-content">
+        <div class="section">
+            <h3>📌 Tentang Compounding Interest</h3>
+            <p>
+      <strong>Compounding interest</strong>, atau yang sering aku sebut sebagai <em>"taman"</em> karena ia <strong>berbunga-bunga</strong>,
+      adalah ketika kamu menginvestasikan uangmu beserta keuntungan yang kamu dapat, dan kamu tabung atau investasikan lagi.
+      Simpel, kan?
+    </p>
+    <blockquote>
+      "Compounding interest adalah keajaiban ke-8 dunia. Siapa yang memahaminya akan mendapatkan keuntungan. Siapa yang tidak, akan membayarnya."
+      <br>— Albert Einstein
+    </blockquote>
+    <p>
+      Dan ini bukan tanpa alasan. Coba aja kamu buat skenario sederhana—hasilnya luar biasa kan?
+    </p>
+            <p><strong>Rumus yang saya gunakan:</strong></p>
+            <p>FV = PV × (1 + r)<sup>n</sup> + PMT × [((1 + r)<sup>n</sup> - 1) / r]</p>
+            <p>Dimana:</p>
+            <ul>
+                <li>FV = Nilai masa depan</li>
+                <li>PV = Investasi awal</li>
+                <li>r = Return per periode</li>
+                <li>n = Jumlah periode</li>
+                <li>PMT = Investasi berkala</li>
+            </ul>
+            
+            <p class="info-text">Catatan: Perhitungan ini adalah proyeksi dan tidak menjamin hasil aktual. Return investasi saham tidak tetap setiap tahunnya.</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2025 Kalkulator Compounding Interest | @anjubinara
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Variabel global
+        let growthChart;
+        let currentScenario = 1;
+        let totalScenarios = 3; // Default 3 skenario
+        let results = {};
+        
+        // Inisialisasi
+        document.addEventListener('DOMContentLoaded', function() {
+            // Buat input untuk skenario 2 dan 3
+            for (let i = 2; i <= 3; i++) {
+                addScenarioInput(i);
+            }
+            
+            // Buat canvas untuk chart
+            const canvas = document.createElement('canvas');
+            canvas.id = 'growthChart';
+            document.querySelector('.chart-container').appendChild(canvas);
+        });
+
+        function hitungCompounding() {
+            const scenario = currentScenario;
+            const investasiAwal = parseFloat(document.getElementById(`investasiAwal${scenario}`).value) || 0;
+            const periode = parseInt(document.getElementById(`periode${scenario}`).value) || 0;
+            const returnRate = parseFloat(document.getElementById(`returnRate${scenario}`).value) || 0;
+            const investasiBulanan = parseFloat(document.getElementById(`investasiBulanan${scenario}`).value) || 0;
+            const dividenYield = parseFloat(document.getElementById(`dividenYield${scenario}`).value) || 0;
+            const dividenReinvest = document.getElementById(`dividenReinvest${scenario}`).value === 'true';
+
+            if (!investasiAwal || !periode || !returnRate) {
+                alert("Harap isi investasi awal, periode, dan return tahunan!");
+                return;
+            }
+
+            const returnTahunan = returnRate / 100;
+            const dividenTahunan = dividenYield / 100;
+
+            let nilaiInvestasi = investasiAwal;
+            let totalInvestasi = investasiAwal;
+            const proyeksi = [];
+
+            for (let tahun = 1; tahun <= periode; tahun++) {
+                // Hitung return tahunan
+                nilaiInvestasi *= (1 + returnTahunan);
+                
+                // Tambahkan investasi bulanan (dengan compounding)
+                if (investasiBulanan > 0) {
+                    for (let bulan = 1; bulan <= 12; bulan++) {
+                        const bulanBekerja = 12 - bulan + 1;
+                        nilaiInvestasi += investasiBulanan * Math.pow(1 + returnTahunan/12, bulanBekerja);
+                    }
+                    totalInvestasi += investasiBulanan * 12;
+                }
+                
+                // Tambahkan dividen jika reinvest
+                if (dividenReinvest && dividenYield > 0) {
+                    nilaiInvestasi *= (1 + dividenTahunan);
+                }
+                
+                const keuntungan = nilaiInvestasi - totalInvestasi;
+                const roi = (keuntungan / totalInvestasi) * 100;
+                
+                proyeksi.push({
+                    tahun: tahun,
+                    nilai: nilaiInvestasi,
+                    total: totalInvestasi,
+                    keuntungan: keuntungan,
+                    roi: roi
+                });
+            }
+
+            // Simpan hasil
+            results[scenario] = {
+                investasiAwal: investasiAwal,
+                periode: periode,
+                returnRate: returnRate,
+                investasiBulanan: investasiBulanan,
+                dividenYield: dividenYield,
+                dividenReinvest: dividenReinvest,
+                proyeksi: proyeksi,
+                nilaiAkhir: nilaiInvestasi,
+                totalInvestasi: totalInvestasi,
+                keuntungan: nilaiInvestasi - totalInvestasi,
+                persenKeuntungan: ((nilaiInvestasi - totalInvestasi) / totalInvestasi) * 100
+            };
+
+            // Tampilkan hasil
+            tampilkanHasil(scenario);
+            
+            // Update chart gabungan
+            updateCombinedChart();
+            
+            // Update tabel perbandingan
+            updateComparisonTable();
+        }
+
+        function tampilkanHasil(scenario) {
+            const result = results[scenario];
+            if (!result) return;
+            
+            // Update UI
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('currentScenarioDisplay').textContent = scenario;
+            document.getElementById('nilaiAkhir').textContent = result.nilaiAkhir.toLocaleString('id-ID', {maximumFractionDigits: 0});
+            document.getElementById('totalInvestasi').textContent = result.totalInvestasi.toLocaleString('id-ID', {maximumFractionDigits: 0});
+            document.getElementById('keuntungan').textContent = result.keuntungan.toLocaleString('id-ID', {maximumFractionDigits: 0});
+            document.getElementById('persenKeuntungan').textContent = result.persenKeuntungan.toFixed(2);
+
+            // Buat summary text
+            const summaryText = document.getElementById('summaryText');
+            summaryText.innerHTML = `
+                <p>Dengan investasi awal sebesar <strong>Rp${result.investasiAwal.toLocaleString('id-ID')}</strong> 
+                ${result.investasiBulanan > 0 ? `dan investasi bulanan <strong>Rp${result.investasiBulanan.toLocaleString('id-ID')}</strong> ` : ''}
+                selama <strong>${result.periode} tahun</strong>, 
+                dengan asumsi return tahunan <strong>${result.returnRate}%</strong>
+                ${result.dividenYield > 0 ? `dan dividen ${result.dividenYield}% ${result.dividenReinvest ? 'yang di-reinvest' : ''}` : ''}, 
+                maka:</p>
+            `;
+
+            // Update proyeksi table
+            const tableBody = document.querySelector('#proyeksiTable tbody');
+            tableBody.innerHTML = '';
+            result.proyeksi.forEach(item => {
+                const row = tableBody.insertRow();
+                row.insertCell(0).textContent = item.tahun;
+                row.insertCell(1).textContent = 'Rp' + item.nilai.toLocaleString('id-ID', {maximumFractionDigits: 0});
+                row.insertCell(2).textContent = 'Rp' + item.total.toLocaleString('id-ID', {maximumFractionDigits: 0});
+                row.insertCell(3).textContent = 'Rp' + item.keuntungan.toLocaleString('id-ID', {maximumFractionDigits: 0});
+                row.insertCell(4).textContent = item.roi.toFixed(2) + '%';
+            });
+        }
+
+        function updateCombinedChart() {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            
+            if (growthChart) {
+                growthChart.destroy();
+            }
+            
+            // Warna untuk setiap skenario
+            const colors = [
+                { border: '#3498db', background: 'rgba(52, 152, 219, 0.1)' },
+                { border: '#2ecc71', background: 'rgba(46, 204, 113, 0.1)' },
+                { border: '#9b59b6', background: 'rgba(155, 89, 182, 0.1)' },
+                { border: '#e74c3c', background: 'rgba(231, 76, 60, 0.1)' },
+                { border: '#f39c12', background: 'rgba(243, 156, 18, 0.1)' }
+            ];
+            
+            // Siapkan data untuk chart
+            const datasets = [];
+            const labels = [];
+            
+            // Cari periode terpanjang untuk labels
+            let maxPeriod = 0;
+            Object.keys(results).forEach(scenario => {
+                if (results[scenario].periode > maxPeriod) {
+                    maxPeriod = results[scenario].periode;
+                }
+            });
+            
+            // Buat labels (Tahun 1, Tahun 2, dst)
+            for (let i = 1; i <= maxPeriod; i++) {
+                labels.push('Tahun ' + i);
+            }
+            
+            // Buat dataset untuk setiap skenario yang sudah dihitung
+            Object.keys(results).forEach((scenario, index) => {
+                const result = results[scenario];
+                const color = colors[index % colors.length];
+                
+                // Ambil data nilai investasi per tahun
+                const data = result.proyeksi.map(item => item.nilai);
+                
+                // Jika periode lebih pendek dari maxPeriod, isi dengan null
+                while (data.length < maxPeriod) {
+                    data.push(null);
+                }
+                
+                datasets.push({
+                    label: `Skenario ${scenario} (${result.returnRate}% return)`,
+                    data: data,
+                    borderColor: color.border,
+                    backgroundColor: color.background,
+                    fill: true,
+                    tension: 0.1,
+                    borderWidth: 2
+                });
+            });
+            
+            // Buat chart
+            growthChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'Rp' + value.toLocaleString('id-ID');
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.raw !== null) {
+                                        label += 'Rp' + context.raw.toLocaleString('id-ID');
+                                    } else {
+                                        label += 'Tidak ada data';
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateComparisonTable() {
+            const comparisonDiv = document.getElementById('scenarioComparison');
+            if (Object.keys(results).length === 0) return;
+            
+            // Cari nilai tertinggi untuk setiap kategori
+            const maxValues = {
+                nilaiAkhir: Math.max(...Object.values(results).map(r => r.nilaiAkhir)),
+                keuntungan: Math.max(...Object.values(results).map(r => r.keuntungan)),
+                persenKeuntungan: Math.max(...Object.values(results).map(r => r.persenKeuntungan))
+            };
+            
+            // Buat tabel perbandingan
+            let html = `
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            ${Object.keys(results).map(scenario => `
+                                <th class="scenario-header">Skenario ${scenario}</th>
+                            `).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Investasi Awal</td>
+                            ${Object.keys(results).map(scenario => `
+                                <td>Rp${results[scenario].investasiAwal.toLocaleString('id-ID')}</td>
+                            `).join('')}
+                        </tr>
+                        <tr>
+                            <td>Investasi Bulanan</td>
+                            ${Object.keys(results).map(scenario => `
+                                <td>${results[scenario].investasiBulanan > 0 ? 'Rp' + results[scenario].investasiBulanan.toLocaleString('id-ID') : '-'}</td>
+                            `).join('')}
+                        </tr>
+                        <tr>
+                            <td>Return Tahunan</td>
+                            ${Object.keys(results).map(scenario => `
+                                <td>${results[scenario].returnRate}%</td>
+                            `).join('')}
+                        </tr>
+                        <tr>
+                            <td>Dividen Yield</td>
+                            ${Object.keys(results).map(scenario => `
+                                <td>${results[scenario].dividenYield > 0 ? results[scenario].dividenYield + '%' + (results[scenario].dividenReinvest ? ' (reinvest)' : '') : '-'}</td>
+                            `).join('')}
+                        </tr>
+                        <tr>
+                            <td>Periode</td>
+                            ${Object.keys(results).map(scenario => `
+                                <td>${results[scenario].periode} tahun</td>
+                            `).join('')}
+                        </tr>
+                        <tr>
+                            <td>Total Investasi</td>
+                            ${Object.keys(results).map(scenario => `
+                                <td>Rp${results[scenario].totalInvestasi.toLocaleString('id-ID')}</td>
+                            `).join('')}
+                        </tr>
+                        <tr>
+                            <td>Nilai Akhir</td>
+                            ${Object.keys(results).map(scenario => `
+                                <td class="${results[scenario].nilaiAkhir === maxValues.nilaiAkhir ? 'best-value' : ''}">
+                                    Rp${results[scenario].nilaiAkhir.toLocaleString('id-ID')}
+                                </td>
+                            `).join('')}
+                        </tr>
+                        <tr>
+                            <td>Keuntungan</td>
+                            ${Object.keys(results).map(scenario => `
+                                <td class="${results[scenario].keuntungan === maxValues.keuntungan ? 'best-value' : ''}">
+                                    Rp${results[scenario].keuntungan.toLocaleString('id-ID')}
+                                </td>
+                            `).join('')}
+                        </tr>
+                        <tr>
+                            <td>ROI</td>
+                            ${Object.keys(results).map(scenario => `
+                                <td class="${results[scenario].persenKeuntungan === maxValues.persenKeuntungan ? 'best-value' : ''}">
+                                    ${results[scenario].persenKeuntungan.toFixed(2)}%
+                                </td>
+                            `).join('')}
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+            
+            comparisonDiv.innerHTML = html;
+        }
+
+        function switchScenario(scenario) {
+            // Update current scenario
+            currentScenario = scenario;
+            
+            // Update UI tab
+            document.querySelectorAll('.scenario-tab').forEach((tab, index) => {
+                if (index + 1 === scenario || (index === document.querySelectorAll('.scenario-tab').length - 1 && scenario > totalScenarios)) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            // Show active input
+            document.querySelectorAll('.scenario-input').forEach(input => {
+                if (parseInt(input.dataset.scenario) === scenario) {
+                    input.classList.add('active');
+                } else {
+                    input.classList.remove('active');
+                }
+            });
+            
+            // Jika hasil sudah ada, tampilkan
+            if (results[scenario]) {
+                tampilkanHasil(scenario);
+            } else {
+                document.getElementById('result').style.display = 'none';
+            }
+        }
+
+        function addScenarioInput(scenario) {
+            const newInputDiv = document.createElement('div');
+            newInputDiv.className = 'scenario-input';
+            newInputDiv.dataset.scenario = scenario;
+            newInputDiv.innerHTML = `
+                <h4>Investasi Awal</h4>
+                <input type="number" id="investasiAwal${scenario}" placeholder="Jumlah investasi awal (Rp)" min="0">
+                
+                <h4>Periode & Return</h4>
+                <input type="number" id="periode${scenario}" placeholder="Periode investasi (tahun)" min="1">
+                <input type="number" id="returnRate${scenario}" placeholder="Return tahunan (%)" step="0.1" min="0">
+                
+                <h4>Tambahan Investasi Berkala</h4>
+                <input type="number" id="investasiBulanan${scenario}" placeholder="Investasi bulanan (Rp)" min="0">
+                
+                <h4>Dividen</h4>
+                <input type="number" id="dividenYield${scenario}" placeholder="Dividen yield tahunan (%)" step="0.1" min="0">
+                <select id="dividenReinvest${scenario}">
+                    <option value="true">Reinvest dividen</option>
+                    <option value="false">Tidak reinvest dividen</option>
+                </select>
+            `;
+            
+            document.getElementById('scenarioInputs').appendChild(newInputDiv);
+        }
+
+        function addScenario() {
+            if (totalScenarios >= 5) {
+                alert("Maksimal 5 skenario");
+                return;
+            }
+            
+            totalScenarios++;
+            const newScenario = totalScenarios;
+            
+            // Tambah tab
+            const newTab = document.createElement('button');
+            newTab.className = 'scenario-tab';
+            newTab.textContent = `Skenario ${newScenario}`;
+            newTab.onclick = function() { switchScenario(newScenario); };
+            
+            const tabsContainer = document.querySelector('.scenario-tabs');
+            tabsContainer.insertBefore(newTab, tabsContainer.lastChild);
+            
+            // Tambah input fields
+            addScenarioInput(newScenario);
+            
+            // Switch ke skenario baru
+            switchScenario(newScenario);
+        }
+
+        function resetForm() {
+            document.querySelectorAll('.scenario-input').forEach(input => {
+                const scenario = input.dataset.scenario;
+                document.getElementById(`investasiAwal${scenario}`).value = '';
+                document.getElementById(`periode${scenario}`).value = '';
+                document.getElementById(`returnRate${scenario}`).value = '';
+                document.getElementById(`investasiBulanan${scenario}`).value = '';
+                document.getElementById(`dividenYield${scenario}`).value = '';
+                document.getElementById(`dividenReinvest${scenario}`).value = 'true';
+            });
+            
+            document.getElementById('result').style.display = 'none';
+            results = {};
+        }
+
+        function openTab(tabName) {
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            
+            const tabButtons = document.getElementsByClassName('tab-btn');
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove('active');
+            }
+            
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>

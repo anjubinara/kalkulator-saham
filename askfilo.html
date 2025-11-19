@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tebak Dulu Baru Tahu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #020617, #020617 40%, #020617 70%, #020617);
+      color: #e5e7eb;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+    .wrapper {
+      max-width: 520px;
+      width: 100%;
+    }
+    .card {
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: 20px;
+      padding: 20px 20px 18px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(16px);
+    }
+    .title {
+      margin: 0 0 4px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #f9fafb;
+    }
+    .subtitle {
+      margin: 0 0 16px;
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    .question-box {
+      padding: 14px 12px;
+      border-radius: 14px;
+      border: 1px solid #1f2937;
+      background: radial-gradient(circle at top left, #111827, #020617);
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 14px;
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+    }
+    .question-prefix {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6b7280;
+      margin-bottom: 2px;
+      display: block;
+    }
+    .question-text {
+      color: #e5e7eb;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .option-btn {
+      border-radius: 999px;
+      padding: 9px 14px;
+      font-size: 13px;
+      border: 1px solid #1f2937;
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.1s ease, transform 0.06s ease, border-color 0.1s ease,
+        box-shadow 0.1s ease;
+    }
+    .option-btn span.label {
+      flex: 1;
+    }
+    .option-btn span.chevron {
+      font-size: 14px;
+      opacity: 0.7;
+      margin-left: 8px;
+    }
+    .option-btn:hover {
+      background: radial-gradient(circle at top, #0f172a, #020617);
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.3);
+      transform: translateY(-1px);
+    }
+    .option-btn:active {
+      transform: translateY(0);
+      box-shadow: none;
+      filter: brightness(0.98);
+    }
+    .option-btn.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .answer-box {
+      padding: 10px 12px 8px;
+      border-radius: 14px;
+      border: 1px solid #1f2937;
+      background: rgba(15, 23, 42, 0.9);
+      min-height: 52px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #e5e7eb;
+      margin-bottom: 12px;
+    }
+    .answer-box.empty {
+      color: #6b7280;
+      font-style: italic;
+    }
+    .answer-prefix {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6b7280;
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .next-btn {
+      width: 100%;
+      border-radius: 999px;
+      padding: 9px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, #38bdf8, #a855f7);
+      color: white;
+      box-shadow: 0 10px 25px rgba(56, 189, 248, 0.4);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.12s ease;
+    }
+    .next-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(56, 189, 248, 0.55);
+      filter: brightness(1.05);
+    }
+    .next-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.9);
+      filter: brightness(0.98);
+    }
+    .helper-text {
+      margin-top: 8px;
+      font-size: 10px;
+      color: #6b7280;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 16px 14px 14px;
+      }
+      .question-box {
+        font-size: 13px;
+        padding: 12px 10px;
+      }
+      .option-btn {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="card">
+      <h1 class="title">Menurutmuuuu? </h1>
+      <p class="subtitle">
+        Jawab pakai intuisi.
+      </p>
+
+      <div class="question-box">
+        <div>
+          <span class="question-prefix">Pertanyaan</span>
+          <div class="question-text" id="question-text">
+            Klik "Tanya" untuk mulai.
+          </div>
+        </div>
+      </div>
+
+      <div class="options">
+        <button class="option-btn" id="option-a">
+          <span class="label" id="option-a-label">—</span>
+          <span class="chevron">›</span>
+        </button>
+        <button class="option-btn" id="option-b">
+          <span class="label" id="option-b-label">—</span>
+          <span class="chevron">›</span>
+        </button>
+      </div>
+
+      <div class="answer-box empty" id="answer-box">
+        <span class="answer-prefix">Penjelasan</span>
+        <div id="answer-text">
+          Jawabanmu akan direspon di sini.
+        </div>
+      </div>
+
+      <button class="next-btn" id="next-btn">Tanya</button>
+
+      <div class="helper-text">
+        Tak ada jawaban yang benar atau salah. Hanya aku yang ingin mengenalmu lebih jauh.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "Menurutmu, mana yang lebih dulu datang: ketakutan atau keberanian?",
+        options: ["Takut dulu", "Keberanian dulu"],
+        explanations: [
+          "Takut sering datang lebih dulu, karena tubuhmu ingin melindungi diri. Itu naluri paling tua yang kita punya. Keberanian justru lahir setelahnya, bukan sebagai lawan, tapi sebagai keputusan untuk tetap melangkah meski takutnya belum pergi.",
+          "Jika keberanian menurutmu muncul lebih dulu, itu mungkin karena kamu mengenal dorongan kecil dalam diri yang berkata ‘coba dulu’. Ketakutan biasanya menyusul belakangan, ketika jalan sudah terbuka."
+        ]
+      },
+      {
+        question: "Lebih sulit yang mana: jujur ke orang lain atau jujur ke diri sendiri?",
+        options: ["Jujur ke orang lain", "Jujur ke diri sendiri"],
+        explanations: [
+          "Jujur ke orang lain sering terasa beresiko: takut ditinggalkan, disalahpahami, atau dinilai. Tapi kadang, kejujuran ke orang lain baru mungkin terjadi setelah kamu jujur sama dirimu sendiri.",
+          "Kalau kamu merasa jujur ke diri sendiri lebih sulit, mungkin karena di sana tidak ada topeng. Di depan orang lain kamu bisa bermain peran; di depan diri sendiri, tidak ada panggung."
+        ]
+      },
+      {
+        question: "Menurutmu, apa yang lebih dulu runtuh: harapan atau kesabaran?",
+        options: ["Harapan dulu", "Kesabaran dulu"],
+        explanations: [
+          "Harapan runtuh lebih dulu karena ia berdiri di atas kemungkinan, bukan kepastian. Tapi justru dari reruntuhan itulah manusia belajar memilih apa yang pantas dijadikan tujuan.",
+          "Kesabaran yang habis sering membongkar siapa kita sebenarnya. Dari sana, kamu bisa melihat: harapan macam apa yang memang layak dipertahankan."
+        ]
+      },
+      {
+        question: "Mana yang lebih melelahkan: menahan marah atau menahan sedih?",
+        options: ["Menahan marah", "Menahan sedih"],
+        explanations: [
+          "Menahan marah melelahkan karena kamu sedang menelan api sambil pura-pura tidak terbakar. Marah yang tidak keluar tidak hilang, ia berubah bentuk, menyusup ke tubuhmu dan menggerogoti bagian yang paling kamu butuhkan untuk bertahan.",
+          "Menahan sedih membuatmu tampak baik-baik saja, padahal kamu sedang karam pelan-pelan. Suatu saat, tubuh dan pikiranmu akan menagih haknya untuk merasa."
+        ]
+      },
+      {
+        question: "Saat mengambil keputusan besar, kamu lebih sering ikut siapa: logika atau perasaan?",
+        options: ["Logika", "Perasaan"],
+        explanations: [
+          "Logika menjaga agar langkahmu tidak sembrono. Tapi keputusan yang sepenuhnya logis pun bisa terasa hampa kalau hatimu tidak diajak bicara.",
+          "Perasaan bisa menuntunmu ke tempat yang betul-betul kamu inginkan, tapi tanpa logika, kamu mudah tersesat. Hidup sehat jarang memilih satu pihak saja."
+        ]
+      },
+      {
+        question: "Yang lebih susah: melepaskan orang, atau melepaskan versi dirimu di dekat orang itu?",
+        options: ["Melepaskan orangnya", "Melepaskan versi diriku"],
+        explanations: [
+          "Melepaskan orang berarti merelakan cerita yang tidak akan berlanjut. Itu tidak mudah, apalagi jika banyak hal yang belum sempat kamu ucapkan.",
+          "Kadang yang paling berat bukan kehilangan orangnya, tapi kehilangan diri yang kamu kenal ketika bersamanya. Di situ, kamu belajar: dirimu tidak boleh bergantung pada satu cerita."
+        ]
+      },
+      {
+        question: "Menurutmu, apa yang lebih menakutkan: masa lalu atau masa depan?",
+        options: ["Masa lalu", "Masa depan"],
+        explanations: [
+          "Masa lalu menakutkan ketika kamu merasa ia bisa terulang. Padahal ia sudah lewat; yang tersisa hanya pelajaran, kalau kamu pilih untuk memandangnya begitu.",
+          "Masa depan menakutkan karena belum berbentuk. Tapi justru karena belum berbentuk, di sana ada ruang untuk hal-hal baik yang belum pernah kamu bayangkan."
+        ]
+      },
+      {
+        question: "Lebih mudah yang mana: memaafkan orang lain atau memaafkan diri sendiri?",
+        options: ["Memaafkan orang lain", "Memaafkan diri sendiri"],
+        explanations: [
+          "Memaafkan orang lain tidak selalu berarti membenarkan mereka. Itu sering hanya keputusan untuk tidak terus memanggul beban yang sama.",
+          "Memaafkan diri sendiri butuh keberanian untuk mengakui: kamu pernah salah, tapi kamu juga berhak berubah. Tanpa itu, kamu akan terus hidup sebagai versi yang sudah lewat."
+        ]
+      },
+      {
+        question: "Saat lelah, kamu lebih sering: lari dari masalah atau pura-pura kuat?",
+        options: ["Lari dari masalah", "Pura-pura kuat"],
+        explanations: [
+          "Lari bukan selalu pengecut. Kadang itu cara tubuhmu berkata, 'aku butuh jarak'. Yang penting, suatu hari kamu berani menoleh dan menghadapi kembali.",
+          "Pura-pura kuat bisa menyelamatkanmu sesaat, tapi melelahkan jika jadi kebiasaan. Ada waktunya mengaku lelah bukan kelemahan, tapi kejujuran."
+        ]
+      },
+      {
+        question: "Kamu lebih takut kehilangan apa: waktu atau orang?",
+        options: ["Waktu", "Orang"],
+        explanations: [
+          "Takut kehilangan waktu artinya kamu sadar hidup ini terbatas. Tapi jangan sampai ketakutan itu membuatmu lupa menikmati detik yang sedang kamu jalani.",
+          "Takut kehilangan orang wajar, karena kita makhluk yang terhubung. Tapi kamu juga perlu ingat: kamu tidak pernah benar-benar kehilangan dirimu sendiri sepanjang masih hidup."
+        ]
+      },
+      {
+        question: "Mana yang menurutmu lebih jujur: kata-kata atau diam?",
+        options: ["Kata-kata", "Diam"],
+        explanations: [
+          "Kata-kata bisa menipu, tapi juga bisa menyelamatkan. Yang penting bukan banyaknya, tapi apakah kamu berani mengatakan yang sebenarnya.",
+          "Diam bisa berarti banyak hal: marah, pasrah, takut, atau tenang. Kalau kamu memilih diam itu jujur, mungkin kamu pernah merasa kalimat justru merusak sesuatu."
+        ]
+      },
+      {
+        question: "Kalau hidup adalah perjalanan, kamu lebih sering merasa sebagai: penumpang atau pengemudi?",
+        options: ["Penumpang", "Pengemudi"],
+        explanations: [
+          "Merasa seperti penumpang berarti kamu sering ikut alur. Tidak selalu buruk; kadang hidup memang berjalan lewat keputusan orang lain. Tapi kamu tetap berhak turun di halte yang kamu pilih.",
+          "Merasa sebagai pengemudi melelahkan, karena semua keputusan terasa tanggung jawabmu. Tapi di situ pula kamu punya kuasa untuk membelokkan arah ketika perlu."
+        ]
+      },
+      {
+        question: "Menurutmu, mana yang lebih dulu datang: luka atau pelajaran?",
+        options: ["Luka dulu", "Pelajaran dulu"],
+        explanations: [
+          "Luka hampir selalu datang duluan. Pelajaran baru tampak setelah jarak dan waktu memberimu sudut pandang berbeda.",
+          "Kalau kamu melihat pelajaran dulu, mungkin kamu sudah cukup jauh berjalan dari lukamu. Itu tanda baik: sakitnya tidak lagi memegangmu sekuat dulu."
+        ]
+      },
+      {
+        question: "Dalam hubungan apa pun, yang lebih penting menurutmu: rasa aman atau rasa berbunga-bunga?",
+        options: ["Rasa aman", "Rasa berbunga-bunga"],
+        explanations: [
+          "Rasa aman memberi tempat bagi diri yang sebenarnya. Tanpa itu, berbunga-bunga hanya jadi pesta singkat yang mudah berakhir.",
+          "Rasa berbunga-bunga penting, karena manusia butuh merasa hidup. Tapi jika hanya mengejar itu, kamu bisa lupa mencari tempat yang benar-benar bisa menampungmu."
+        ]
+      },
+      {
+        question: "Saat semua terasa hampa, kamu lebih condong: berhenti sejenak atau memaksa diri produktif?",
+        options: ["Berhenti sejenak", "Tetap memaksa produktif"],
+        explanations: [
+          "Berhenti sejenak bukan berarti kalah. Justru di jeda, kamu bisa melihat apa yang selama ini kamu jalani tanpa sempat dipikirkan.",
+          "Memaksa diri produktif bisa menyelamatkanmu dari tenggelam di kepala sendiri. Tapi suatu saat, kamu tetap perlu duduk dan menanyakan: 'sebenarnya aku sedang ke mana?'"
+        ]
+      },
+      {
+        question: "Lebih menenangkan yang mana: kepastian pahit atau ketidakpastian manis?",
+        options: ["Kepastian pahit", "Ketidakpastian manis"],
+        explanations: [
+          "Kepastian pahit menyakiti di awal, tapi memberi ruang untuk menyusun ulang hidup. Kamu tahu apa yang tidak lagi perlu kamu kejar.",
+          "Ketidakpastian manis menghibur, tapi bisa mengikatmu di tempat yang sama terlalu lama. Pertanyaannya: sampai kapan kamu ingin menunggu jawaban yang tidak datang?"
+        ]
+      },
+      {
+        question: "Kalau bisa memilih, kamu lebih ingin: melupakan atau mengerti?",
+        options: ["Melupakan", "Mengerti"],
+        explanations: [
+          "Keinginan untuk melupakan datang dari lelah. Tidak salah. Tapi kadang, yang kamu butuh bukan lupa, melainkan cara baru memandang hal yang sama.",
+          "Mengerti itu lebih berat, karena kamu harus berhadapan dengan kenyataan apa adanya. Tapi dari pengertian, kamu bisa bergerak dengan lebih bebas."
+        ]
+      }
+    ];
+
+    const questionTextEl = document.getElementById("question-text");
+    const optionAButton = document.getElementById("option-a");
+    const optionBButton = document.getElementById("option-b");
+    const optionALabel = document.getElementById("option-a-label");
+    const optionBLabel = document.getElementById("option-b-label");
+    const answerBox = document.getElementById("answer-box");
+    const answerTextEl = document.getElementById("answer-text");
+    const nextBtn = document.getElementById("next-btn");
+
+    let currentIndex = -1;
+    let usedIndices = [];
+
+    function pickNextIndex() {
+      if (usedIndices.length === questions.length) {
+        usedIndices = [];
+      }
+      let idx;
+      do {
+        idx = Math.floor(Math.random() * questions.length);
+      } while (usedIndices.includes(idx) && usedIndices.length < questions.length);
+      usedIndices.push(idx);
+      return idx;
+    }
+
+    function setOptionsEnabled(enabled) {
+      const method = enabled ? "remove" : "add";
+      optionAButton.classList[method]("disabled");
+      optionBButton.classList[method]("disabled");
+    }
+
+    function loadQuestion() {
+      currentIndex = pickNextIndex();
+      const q = questions[currentIndex];
+      questionTextEl.textContent = q.question;
+      optionALabel.textContent = q.options[0];
+      optionBLabel.textContent = q.options[1];
+      answerTextEl.textContent = "Jawabanmu akan direspon di sini.";
+      answerBox.classList.add("empty");
+      setOptionsEnabled(true);
+    }
+
+    optionAButton.addEventListener("click", () => {
+      if (currentIndex === -1) return;
+      const q = questions[currentIndex];
+      const text = q.explanations[0];
+      answerTextEl.textContent = text;
+      answerBox.classList.remove("empty");
+      setOptionsEnabled(false);
+    });
+
+    optionBButton.addEventListener("click", () => {
+      if (currentIndex === -1) return;
+      const q = questions[currentIndex];
+      const text = q.explanations[1];
+      answerTextEl.textContent = text;
+      answerBox.classList.remove("empty");
+      setOptionsEnabled(false);
+    });
+
+    nextBtn.addEventListener("click", () => {
+      loadQuestion();
+    });
+  </script>
+</body>
+</html>

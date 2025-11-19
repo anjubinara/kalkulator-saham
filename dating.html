@@ -1,40 +1,461 @@
-< !DOCTYPE html > < html lang = "id" > < head > < meta charset = "UTF-8" /> < title > Dating Simulator Anjubinara</title > < meta name = "viewport" content = "width=device-width, initial-scale=1.0" /> < style >
-* {
-    box-sizing: border-box;
-}
-body {
-    margin: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-    background: radial-gradient(circle at top, #ffe4f0, #fdf2ff);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        padding: 16px;
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dating Simulator Anjubinara</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: #f6f6f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px;
+    }
+    .game-wrapper {
+      width: 100%;
+      max-width: 480px;
+    }
+    .back-link {
+      font-size: 13px;
+      margin-bottom: 8px;
+      text-align: left;
+    }
+    .back-link a {
+      color: #0077b6;
+      text-decoration: none;
+    }
+    .back-link a:hover {
+      text-decoration: underline;
     }
     .game-card {
-        background: white;
-        max-width: 420px;
-        width: 100%;
-        border-radius: 18px;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-        padding: 20px 20px 16px;
+      background: white;
+      width: 100%;
+      border-radius: 18px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+      padding: 20px 20px 16px;
     }
     .header {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
     }
     .avatar {
-        width: 46px;
-        height: 46px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #ff5c8a, #ff9a9e);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff5c8a, #ff9a9e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .title-group h1 {
+      font-size: 18px;
+      margin: 0;
+    }
+    .title-group span {
+      font-size: 12px;
+      color: #777;
+    }
+    .affection-bar {
+      margin: 8px 0 16px;
+    }
+    .affection-label {
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      color: #555;
+    }
+    .affection-track {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: #f1f1f1;
+      overflow: hidden;
+    }
+    .affection-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #ff5c8a, #ffb199);
+      transition: width 0.3s ease;
+    }
+    .dialogue-box {
+      background: #fff7fb;
+      border-radius: 12px;
+      padding: 14px 14px 12px;
+      margin-bottom: 14px;
+      border: 1px solid #ffe3f3;
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+    }
+    .dialogue-text {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .choices {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .choice-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 14px;
+      text-align: left;
+      cursor: pointer;
+      background: #f4f4f4;
+      transition: transform 0.08s ease, box-shadow 0.08s ease,
+        background 0.15s ease;
+    }
+    .choice-btn.primary {
+      background: linear-gradient(135deg, #ff5c8a, #ff9a9e);
+      color: white;
+    }
+    .choice-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+    .choice-btn:active {
+      transform: translateY(0px);
+      box-shadow: none;
+    }
+    .footnote {
+      font-size: 11px;
+      color: #999;
+      text-align: center;
+      margin-top: 6px;
+    }
+    .tagline {
+      font-size: 11px;
+      text-align: center;
+      color: #777;
+      margin-bottom: 8px;
+    }
+    @media (max-width: 480px) {
+      .game-card {
+        padding: 16px 14px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-wrapper">
+    <div class="back-link">
+      ← <a href="index.html">Kembali ke beranda kalkulator</a>
+    </div>
+
+    <div class="game-card">
+      <div class="header">
+        <div class="avatar">A</div>
+        <div class="title-group">
+          <h1>Dating Simulator</h1>
+          <span>by anjubinara • mini game PDKT</span>
+        </div>
+      </div>
+
+      <div class="affection-bar">
+        <div class="affection-label">
+          <span>Affection</span>
+          <span id="affectionValue">0 / 100</span>
+        </div>
+        <div class="affection-track">
+          <div class="affection-fill" id="affectionFill"></div>
+        </div>
+      </div>
+
+      <p class="tagline">
+        Jawab jujur ya. Setiap pilihan bisa mengubah masa depan (kita). 💖
+      </p>
+
+      <div class="dialogue-box">
+        <div class="dialogue-text" id="dialogueText">
+          Loading...
+        </div>
+      </div>
+
+      <div class="choices" id="choicesContainer"></div>
+
+      <div class="footnote">
+        Tekan pilihanmu, jangan terlalu banyak mikir. Hidup dan cinta tidak bisa
+        di-undo. ✨
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let affection = 0;
+    let currentScene = "intro";
+
+    const affectionFill = document.getElementById("affectionFill");
+    const affectionValue = document.getElementById("affectionValue");
+    const dialogueText = document.getElementById("dialogueText");
+    const choicesContainer = document.getElementById("choicesContainer");
+
+    const scenes = {
+      intro: {
+        text:
+          "Halo. Aku lagi belajar investasi, tapi kayaknya investasi terbaik itu bukan saham... tapi kamu. Mulai game PDKT ini?",
+        choices: [
+          {
+            label: "Mulai dong, siapa takut.",
+            next: "scene1",
+            affection: 10,
+            primary: true,
+          },
+          {
+            label: "Aku cuma mau hitung return, bukan perasaan.",
+            next: "sceneRefuseIntro",
+            affection: 0,
+          },
+        ],
+      },
+
+      sceneRefuseIntro: {
+        text:
+          "Kenapa sih… kalkulator aja mau kamu buka, masa hati aku nggak? 😔",
+        choices: [
+          {
+            label: "Yaudah deh, mulai sedikit aja.",
+            next: "scene1",
+            affection: 8,
+            primary: true,
+          },
+          {
+            label: "Tetap nggak, aku batu.",
+            next: "brickEnding",
+            affection: -5,
+          },
+        ],
+      },
+
+      scene1: {
+        text:
+          "Oke, bayangin kita first date. Menurut kamu, kencan ideal itu yang kayak gimana?",
+        choices: [
+          {
+            label: "Ngopi santai, ngobrol sampe lupa pulang.",
+            next: "scene2",
+            affection: 15,
+            primary: true,
+          },
+          {
+            label: "Makan enak, pulang masing-masing.",
+            next: "scene2",
+            affection: 7,
+          },
+          {
+            label: "Video call aja, aku mager keluar.",
+            next: "scene2",
+            affection: 3,
+          },
+        ],
+      },
+
+      scene2: {
+        text:
+          "Kalau aku ngajak kamu nabung bareng tiap bulan, kamu bakal…",
+        choices: [
+          {
+            label:
+              "Setuju. Kita bikin tujuan keuangan bareng, juga tujuan masa depan bareng.",
+            next: "scene3",
+            affection: 20,
+            primary: true,
+          },
+          {
+            label:
+              "Terserah, yang penting kamu tetap di sini tiap bulan. Investasi perasaan dulu.",
+            next: "scene3",
+            affection: 15,
+          },
+          {
+            label:
+              "Aku auto kabur kalau denger kata ‘nabung’.",
+            next: "scene3",
+            affection: -5,
+          },
+        ],
+      },
+
+      scene3: {
+        text:
+          "Sekarang pertanyaan serius dikit. Kalau suatu saat aku lagi down, minus, rugi besar, kamu bakal bilang apa?",
+        choices: [
+          {
+            label:
+              "Santai, portofoliomu lagi turun, bukan nilai dirimu. Kita evaluasi bareng.",
+            next: "confession",
+            affection: 25,
+            primary: true,
+          },
+          {
+            label:
+              "Ya harus sabar. Kalau kamu jatuh, aku ikut duduk di sebelahmu.",
+            next: "confession",
+            affection: 18,
+          },
+          {
+            label:
+              "Ya elah, baru rugi dikit. Strong lah, calon pasangan investor.",
+            next: "confession",
+            affection: 8,
+          },
+        ],
+      },
+
+      confession: {
+        text:
+          "Oke… aku udah lihat cara kamu jawab semua pilihan. Sekarang waktunya pertanyaan utama: mau gak jadi pasangan resmiku? 💌",
+        choices: [
+          {
+            label: "Iya, aku mau. 💖",
+            next: "yesEnding",
+            affection: 30,
+            primary: true,
+          },
+          {
+            label: "Nggak dulu, maaf.",
+            next: "noLoop1",
+            affection: -10,
+          },
+        ],
+      },
+
+      noLoop1: {
+        text:
+          "Serius nih? Kamu yakin nolak orang yang baru aja nawarin ‘return of emotion’ tanpa batas?",
+        choices: [
+          {
+            label: "… yaudah deh, aku pikir-pikir lagi. Iya, aku mau.",
+            next: "yesEnding",
+            affection: 20,
+            primary: true,
+          },
+          {
+            label: "Masih nggak.",
+            next: "noLoop2",
+            affection: -5,
+          },
+        ],
+      },
+
+      noLoop2: {
+        text:
+          "Kalau ini saham, aku udah cut loss. Tapi sayangnya ini perasaan, susah dijual. Masih mau nolak juga?",
+        choices: [
+          {
+            label: "Oke, oke. Aku luluh. Iya.",
+            next: "yesEnding",
+            affection: 15,
+            primary: true,
+          },
+          {
+            label: "Tetap nggak, maaf ya.",
+            next: "hardNoEnding",
+            affection: -10,
+          },
+        ],
+      },
+
+      yesEnding: {
+        text:
+          "SELAMAT! 🎉 Mulai hari ini kamu resmi masuk ke portofolio hidupku. Semoga grafik kebahagiaan kita selalu naik, dividen sayang rutin cair tiap hari. 💖📈",
+        choices: [
+          {
+            label: "Main lagi dari awal.",
+            next: "intro",
+            affection: 0,
+            primary: true,
+          },
+        ],
+        ending: true,
+      },
+
+      hardNoEnding: {
+        text:
+          "Oke… berarti ini bukan penolakan, cuma penundaan sampai waktunya tepat. Aku simpan perasaan ini sebagai ‘long term holding’. Kalau mau, kamu bisa main lagi dari awal. 💔",
+        choices: [
+          {
+            label: "Main ulang, siapa tahu jawaban berubah.",
+            next: "intro",
+            affection: 0,
+            primary: true,
+          },
+        ],
+        ending: true,
+      },
+
+      brickEnding: {
+        text:
+          "Kamu keras juga ya, kayak bata. Tapi nggak apa-apa, bahkan tembok pun lama-lama bisa retak kalau terus ditembak doa dan usaha. 😌",
+        choices: [
+          {
+            label: "Coba deh, aku luluh dikit. Mulai lagi.",
+            next: "intro",
+            affection: 5,
+            primary: true,
+          },
+        ],
+        ending: true,
+      },
+    };
+
+    function updateAffection(delta) {
+      affection += delta;
+      if (affection < 0) affection = 0;
+      if (affection > 100) affection = 100;
+      affectionFill.style.width = affection + "%";
+      affectionValue.textContent = affection + " / 100";
+    }
+
+    function renderScene(id) {
+      currentScene = id;
+      const scene = scenes[id];
+
+      dialogueText.textContent = scene.text;
+      choicesContainer.innerHTML = "";
+
+      scene.choices.forEach((choice) => {
+        const btn = document.createElement("button");
+        btn.className = "choice-btn" + (choice.primary ? " primary" : "");
+        btn.textContent = choice.label;
+        btn.addEventListener("click", () => {
+          if (typeof choice.affection === "number") {
+            updateAffection(choice.affection);
+          }
+          renderScene(choice.next);
+        });
+        choicesContainer.appendChild(btn);
+      });
+    }
+
+    updateAffection(0);
+    renderScene("intro");
+  </script>
+</body>
+</html>            justify-content: center;
             color: white;
             font-weight: 700;
             font-size: 20px;
